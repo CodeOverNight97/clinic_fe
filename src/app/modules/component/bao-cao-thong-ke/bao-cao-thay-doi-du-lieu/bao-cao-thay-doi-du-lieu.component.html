@@ -1,0 +1,139 @@
+<div class="card" style="border-radius:0">
+    <div class="grid">
+        <div class="col-12 text-center">
+            <h3 class="m-2">BÁO CÁO THAY ĐỔI DỮ LIỆU</h3>
+            <h5 class="m-1">Thời điểm: Ngày {{now | date: 'dd'}} tháng {{now | date: 'MM'}} năm {{now | date: 'yyyy'}}
+            </h5>
+            <h5 class="m-1">Loại tài sản: Phục vụ công tác quản lý</h5>
+        </div>
+        <div class="col-12 d-flex">
+            <div class="col-4">
+                <span class="p-float-label">
+                    <p-dropdown [options]="comboboxLoaiTaiSan" [(ngModel)]="objFilter.ma_loai_tai_san"
+                        placeholder="Tất cả" [filter]="true" [showClear]="true" appendTo="body" optionLabel="Value"
+                        optionValue="ID" inputId="combobox_loaitaisan"></p-dropdown>
+                    <label for="combobox_loaitaisan">Loại tài sản</label>
+                </span>
+            </div>
+            <div class="col-4">
+                <span class="p-float-label">
+                    <p-dropdown [options]="comboboxDonVi" [(ngModel)]="objFilter.id_donvi" placeholder="Tất cả"
+                        [filter]="false" [showClear]="false" appendTo="body" optionLabel="Value" optionValue="ID"
+                        inputId="combobox_donvi"></p-dropdown>
+                    <label for="combobox_donvi">Đơn vị</label>
+                </span>
+            </div>
+            <div class="col-4">
+                <span class="p-float-label">
+                    <input pInputText id="ma_tai_san" [(ngModel)]="objFilter.ten_tai_san" />
+                    <label for="ma_tai_san">Tên tài sản</label>
+                </span>
+            </div>
+        </div>
+        <div class="col-12 d-flex">
+            <div class="col-4">
+                <span class="p-float-label">
+                    <p-dropdown [options]="comboboxThoiGian" [(ngModel)]="objFilter.type" [showClear]="false"
+                        appendTo="body" optionLabel="text" optionValue="type" (onChange)="ChangeFilterDate($event)"
+                        inputId="combobox_loaitaisan"></p-dropdown>
+                </span>
+            </div>
+            <div class="col-4" *ngIf="showDatePick">
+                <p-calendar [(ngModel)]="objFilter.date" placeholder="Chọn ngày"></p-calendar>
+            </div>
+            <div class="col-4">
+                <span class="p-float-label">
+                    <input pInputText id="ma_tai_san" [(ngModel)]="objFilter.ten_tai_san" />
+                    <label for="ma_tai_san">Tên tài sản</label>
+                </span>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="col">
+                <p-button label="Tìm kiếm" [disabled]="loading_search" [loading]="loading_search" (click)="Search()"
+                    icon="pi pi-file-search" class="mr-2"></p-button>
+                <p-button label="Xuất file Excel" [disabled]="loading_export_excel" [loading]="loading_export_excel"
+                    (click)="XuatExcel()" icon="pi pi-file-excel"></p-button>
+            </div>
+        </div>
+
+        <div class="col-12">
+
+            <p-table [value]="ListData" [columns]="cols" [rowHover]="true" [paginator]="true"
+                [showCurrentPageReport]="true" [rows]="10" [scrollable]="true" scrollHeight="calc(100vh - 23rem)"
+                responsiveLayout="scroll" scrollDirection="both" [loading]="loading_grid"
+                currentPageReportTemplate="Hiển thị {first} - {last} trong số {totalRecords} bản ghi"
+                styleClass="clm p-datatable-gridlines p-datatable-sm">
+                <ng-template pTemplate="header" let-columns>
+                    <tr class="text-center ">
+                        <th class=" grid_header_color"
+                            [ngStyle]="{'min-width': '0px', 'text-align': 'center', 'justify-content':'center'}"
+                            [colSpan]="4">Tài sản</th>
+                        <th class=" grid_header_color"
+                            [ngStyle]="{'min-width': '300px', 'text-align': 'center', 'justify-content':'center'}"
+                            [rowSpan]="2">Đơn vị quản lý</th>
+                        <th class=" grid_header_color"
+                            [ngStyle]="{'min-width': '0px', 'text-align': 'center', 'justify-content':'center'}"
+                            [colSpan]="3">Nguyên giá</th>
+                        <th class=" grid_header_color"
+                            [ngStyle]="{'min-width': '130px', 'text-align': 'center', 'justify-content':'center'}"
+                            [rowSpan]="2">Giá trị còn lại</th>
+                        <th class=" grid_header_color"
+                            [ngStyle]="{'min-width': '250px', 'text-align': 'center', 'justify-content':'center'}"
+                            [rowSpan]="2">Ghi chú</th>
+                        <!-- <th class=" grid_header_color" [ngStyle]="{'min-width': '0px', 'text-align': 'center', 'justify-content':'center'}" [colSpan]="3">Kiểm kê</th> -->
+                    </tr>
+                    <tr class="text-center ">
+                        <th class=" grid_header_color"
+                            [ngStyle]="{'min-width': '100px', 'text-align': 'center', 'justify-content':'center'}">Mã
+                            tài sản</th>
+                        <th class=" grid_header_color"
+                            [ngStyle]="{'min-width': '250px', 'text-align': 'center', 'justify-content':'center'}">Tên
+                            tài sản</th>
+                        <th class=" grid_header_color"
+                            [ngStyle]="{'min-width': '100px', 'text-align': 'center', 'justify-content':'center'}">Năm
+                            sử dụng</th>
+                        <th class=" grid_header_color"
+                            [ngStyle]="{'min-width': '200px', 'text-align': 'center', 'justify-content':'center'}">Thông
+                            số kỹ thuật</th>
+                        <th class=" grid_header_color"
+                            [ngStyle]="{'min-width': '100px', 'text-align': 'center', 'justify-content':'center'}">Tổng
+                            số</th>
+                        <th class=" grid_header_color"
+                            [ngStyle]="{'min-width': '100px', 'text-align': 'center', 'justify-content':'center'}">Ngân
+                            sách</th>
+                        <!-- <th class=" grid_header_color" [ngStyle]="{'min-width': '100px', 'text-align': 'center', 'justify-content':'center'}">Nguồn khác</th>
+                        <th class=" grid_header_color" [ngStyle]="{'min-width': '130px', 'text-align': 'center', 'justify-content':'center'}">Ngày kiểm kê</th>
+                        <th class=" grid_header_color" [ngStyle]="{'min-width': '200px', 'text-align': 'center', 'justify-content':'center'}">Người kiểm kê</th>
+                        <th class=" grid_header_color" [ngStyle]="{'min-width': '250px', 'text-align': 'center', 'justify-content':'center'}">Nội dung kiểm kê</th> -->
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage" let-columns>
+                    <tr>
+                        <td [attr.colspan]="columns.length" style="font-size: 2rem;">
+                            Không có dữ liệu
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-columns="columns" let-rowData let-i="rowIndex">
+                    <tr>
+                        <td *ngFor="let col of columns"
+                            [ngStyle]="{'width': col.width , 'justify-content': col.align, 'text-align': col.align}"
+                            [ngSwitch]="col.field">
+                            <div *ngSwitchCase="'STT'" style="justify-content: center; text-align: center">
+                                {{ i + 1 }}
+                            </div>
+                            <div *ngSwitchCase="'ten_tai_san'"
+                                [ngStyle]="{'justify-content': col.align, 'text-align': col.align, 'margin-left': rowData.addSpace}">
+                                {{rowData['ten_tai_san']}}
+                            </div>
+                            <div *ngSwitchDefault title="{{rowData[col.field]}}">
+                                {{rowData[col.field]}}
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+</div>

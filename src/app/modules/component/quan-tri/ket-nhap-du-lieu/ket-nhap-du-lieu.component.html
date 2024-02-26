@@ -1,0 +1,22 @@
+<!-- <label for="">Chọn đon vị import: </label> -->
+<div class="importTaiSan">
+    <div class="pending" *ngIf="pendingImport">
+        <div style="width: 30%;">
+            <p-progressBar [value]="value"></p-progressBar>
+        </div>
+    </div>
+    <div class="chonDonVi">
+        <p-dropdown [options]="ListDonVi" optionValue="id_don_vi" [(ngModel)]="ID_DonVi" (onChange)="changeDonVi()" [filter]="true" filterBy="ten_don_vi"
+            placeholder="Chọn đơn vị kết nhập dữ liệu" optionLabel="ten_don_vi" [showClear]="true"></p-dropdown>
+    </div>
+    <p-fileUpload #fileUpload [disabled]="false" mode="basic" styleClass="p-button-info mr-2" [auto]=" true"
+        name="myfile[]" accept=".xlsx,.xls" [maxFileSize]="50000000 " [customUpload]="true" chooseIcon="bx bx-import"
+        chooseLabel="Chon File kết nhập" title="Chon File kết nhập" [disabled]="!loadDstsImport"
+        (uploadHandler)="onUpload($event,fileUpload)">
+    </p-fileUpload>
+</div>
+
+
+
+
+<p-toast key="ketNhapDuLieu" position="bottom-right"></p-toast>

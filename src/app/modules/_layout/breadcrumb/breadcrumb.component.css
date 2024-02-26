@@ -1,0 +1,42 @@
+.breadcum {
+    padding-left: 15px;
+    padding-top: 5px;
+    padding-bottom: 10px;
+}
+
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+li {
+    display: inline;
+    font-size: 1.25rem;
+}
+
+li:before {
+    content: ">";
+    margin: 0 6px;
+}
+
+li:first-child:before {
+    content: "";
+    margin: 0;
+}
+
+.breadcum-text {
+    height: 32px;
+    font-family: 'Segoe UI';
+    font-style: normal;
+    font-weight: 700;
+    line-height: 32px;
+    letter-spacing: 0.03em;
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+}
+
+.breadcum-text a {
+    color: #292D32;
+}

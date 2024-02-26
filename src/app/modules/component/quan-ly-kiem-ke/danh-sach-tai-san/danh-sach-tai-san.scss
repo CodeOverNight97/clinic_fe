@@ -1,0 +1,20 @@
+:host ::ng-deep .ng-tns-c4292766971-2.p-dialog-content {
+    padding: 0 0.5rem 1rem 0.5rem;
+}
+
+:host ::ng-deep .p-fieldset .p-fieldset-legend {
+    padding: 0.5rem;
+    border: 1px solid #dee2e6;
+    color: #343a40;
+    background: #f8f9fa;
+    font-weight: 700;
+    border-radius: 6px;
+}
+
+
+:host ::ng-deep .p-fieldset.p-fieldset-toggleable .p-fieldset-legend a {
+    padding: 1px;
+    color: #343a40;
+    border-radius: 6px;
+    transition: box-shadow 0.2s;
+}

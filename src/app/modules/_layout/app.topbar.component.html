@@ -1,0 +1,88 @@
+<style>
+    @media only screen and (max-width: 1920px) {
+        .item-topbar {
+            min-width: 65%;
+        }
+    }
+
+    @media only screen and (max-width: 1600px) {
+        .item-topbar {
+            min-width: 59%;
+        }
+    }
+
+    @media only screen and (max-width: 1400px) {
+        .item-topbar {
+            min-width: 60%;
+        }
+    }
+
+    @media only screen and (max-width: 1200px) {
+        .item-topbar {
+            min-width: 60%;
+        }
+    }
+
+    @media only screen and (max-width: 900px) {
+        .item-topbar {
+            min-width: 60%;
+        }
+    }
+
+    .field {
+        text-align: right;
+        min-width: 10%;
+    }
+
+    .layout-topbar .layout-topbar-menu .layout-topbar-button {
+        margin-left: 0rem;
+    }
+
+    .padding-1rem {
+        padding: 1rem;
+    }
+
+    .card-custom {
+        background: var(--surface-card);
+        border: 1px solid var(--surface-border);
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--card-shadow);
+        border-radius: 12px;
+        justify-items: center;
+        text-align: center;
+        cursor: pointer;
+    }
+
+    .card-custom:hover {
+        color: white;
+        background-color: var(--primary-color);
+    }
+</style>
+
+<div class="layout-topbar">
+    <a class="layout-topbar-logo" routerLink="/home/dashboard">
+        <img src="assets/images/lh_logo.png" alt="logo">
+        <span class="ml-5">SMART GATE</span>
+    </a>
+
+    <button class="p-link layout-menu-button layout-topbar-button p-trigger" (click)="layoutService.onMenuToggle()">
+        <i class="pi pi-bars"></i>
+    </button>
+
+    <button class="p-link layout-topbar-menu-button layout-topbar-button p-trigger"
+        (click)="layoutService.showProfileSidebar()">
+        <i class="pi pi-ellipsis-v"></i>
+    </button>
+    <div class="item-topbar">&nbsp;</div>
+
+    <div class="layout-topbar-menu"
+        [ngClass]="{'layout-topbar-menu-mobile-active': layoutService.state.profileSidebarVisible}">
+        <p-menu #menu [popup]="true" [model]="menuItems"></p-menu>
+        <button (click)="menu.toggle($event)" class="p-link layout-topbar-button">
+            <i style="font-size: 1.3rem;" class="pi pi-user user-icon"></i>
+            <span>Người dùng</span>
+        </button>
+    </div>
+    
+</div>

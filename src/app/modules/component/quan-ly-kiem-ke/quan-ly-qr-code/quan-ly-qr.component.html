@@ -1,0 +1,230 @@
+<div class="card" style="border-radius:0">
+    <div class="grid pt-2">
+        <div class="col">
+            <span class="p-float-label">
+                <p-calendar [(ngModel)]="dateTuNgay" inputId="birth_date" appendTo="body" dateFormat="dd/mm/yy"
+                    [showTime]="true"></p-calendar>
+                <label for="birth_date">Từ ngày</label>
+            </span>
+        </div>
+
+        <div class="col">
+            <span class="p-float-label">
+                <p-calendar [(ngModel)]="dateDenNgay" inputId="birth_date" appendTo="body" dateFormat="dd/mm/yy"
+                    [showTime]="true"></p-calendar>
+                <label for="birth_date">Đến ngày</label>
+            </span>
+        </div>
+
+        <div class="col">
+            <span class="p-float-label">
+                <p-dropdown [options]="listKhaiBao" placeholder="Tất cả" [filter]="true" [showClear]="true"
+                    appendTo="body" optionLabel="Value" optionValue="ID" inputId="combobox_khaibao"
+                    [(ngModel)]="select_Khai_Bao"></p-dropdown>
+                <label for="combobox_khaibao">Khai báo</label>
+            </span>
+        </div>
+
+        <div class="col">
+            <span class="p-float-label">
+                <p-dropdown [options]="listDonVi" placeholder="Tất cả" [filter]="true" [showClear]="true"
+                    appendTo="body" optionLabel="Value" optionValue="ID" inputId="combobox_donvi"
+                    [(ngModel)]="select_Don_Vi"></p-dropdown>
+                <label for="combobox_donvi">Đơn vị</label>
+            </span>
+        </div>
+
+        <div class="col">
+            <span class="p-float-label">
+                <p-multiSelect inputId="combobox_trangthai" [options]="listTrangThai" [showClear]="true" appendTo="body"
+                    [(ngModel)]="select_TrangThai" optionLabel="Value"></p-multiSelect>
+                <label for="combobox_trangthai">Trạng thái</label>
+            </span>
+        </div>
+
+
+        <div class="col-12">
+            <p-button label="Tìm kiếm" [loading]="loading" icon="pi pi-search" (click)="loadData()"
+                class="mr-2"></p-button>
+            <p-button label="Tải file mẫu khai báo" [disabled]="loading" [loading]="isLoading_TaiFileMau"
+                class="p-button-secondary" (click)="taiFileMauQRCode()" icon="pi pi-download" class="mr-2"></p-button>
+            <p-button label="Khai báo QRCode" [disabled]="loading" (click)="isOpen_KhaiBao = true" icon="pi pi-plus"
+                class="mr-2"></p-button>
+            <p-button label="Cấp Phát QRCode" [disabled]="loading" (click)="openCapPhat()" icon="pi pi-qrcode"
+                class="mr-2"></p-button>
+            <!-- <p-button label="Thu hồi QRCode" [disabled]="loading" icon="pi pi-replay" class="mr-2"></p-button>
+            <p-button label="Tiêu hủy QRCode" [disabled]="loading" icon="pi pi-trash" class="mr-2"></p-button> -->
+            <!-- <p-button label="Xuất file Excel" [disabled]="loading" [loading]="loading_excel" (click)="XuatExcel()" icon="pi pi-file-excel" class="mr-2"></p-button> -->
+
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="col-12">
+            <p-table #data_report [value]="data_CallAPI" [columns]="cols_List_CallAPI" [loading]="loading"
+                [rowHover]="true" [paginator]="true" [showCurrentPageReport]="true" [scrollable]="true"
+                scrollHeight="calc(100vh - 20rem)" scrollDirection="both" [rows]="50" (onPage)="loadGridChange($event)"
+                currentPageReportTemplate="Hiển thị {first} - {last} trong số {totalRecords} bản ghi"
+                styleClass="clm p-datatable-gridlines p-datatable-sm">
+                <ng-template pTemplate="header" let-columns>
+                    <tr class="text-center">
+                        <th class="sticky_header grid_header_color" *ngFor="let col of columns"
+                            [ngStyle]="{'width': col.width, 'text-align': 'center', 'justify-content':'center','z-index':(col.field === 'STT' || col.field === 'BoiThuongVien' || col.field === 'DonViXuLy') ? '10000' : '8000'}"
+                            pFrozenColumn
+                            [frozen]="col.field == 'STT' || col.field == 'BoiThuongVien' || col.field == 'DonViXuLy'? true : false">
+                            {{col.header}}
+                        </th>
+                    </tr>
+
+                </ng-template>
+                <ng-template pTemplate="emptymessage" let-columns>
+                    <tr>
+                        <td [attr.colspan]="columns.length" style="font-size: 2rem;">
+                            Không có dữ liệu
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-columns="columns" let-rowData let-i="rowIndex">
+                    <tr>
+                        <td *ngFor="let col of columns"
+                            [ngStyle]="{'width': col.width , 'justify-content': col.align, 'text-align':col.align}"
+                            [ngSwitch]="col.field" pFrozenColumn
+                            [frozen]="col.field == 'STT' || col.field == 'BoiThuongVien' || col.field == 'DonViXuLy'? true : false">
+                            <div *ngSwitchCase="'STT'" style="justify-content:center; text-align:center">
+                                {{ i + 1 }}
+                            </div>
+                            <div *ngSwitchDefault title="{{rowData[col.field]}}">
+                                {{rowData[col.field]}}
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+</div>
+
+
+<p-dialog header="Header" [(visible)]="isOpen_KhaiBao" [modal]="true" [style]="{ width: '50rem' }"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" (onShow)="onShowKhaiBao()">
+    <ng-template pTemplate="header">
+        <span>KHAI BÁO QRCODE</span>
+    </ng-template>
+
+    <div class="grid">
+        <div class="col-12 mt-4">
+            <span class="p-float-label">
+                <input pInputText id="noidung" [disabled]="loading_Import" [(ngModel)]="noiDung_KhaiBao" />
+                <label for="noidung">Nội dung</label>
+            </span>
+        </div>
+        <div class="col-12 mt-3">
+            <div class="p-inputgroup">
+                <p-fileUpload mode="basic" [disabled]="loading_Import" name="demo[]"
+                    url="https://www.primefaces.org/cdn/api/upload.php" accept=".xlsx, .xls" [maxFileSize]="5000000"
+                    (onUpload)="onUpload($event)" [auto]="true">
+                </p-fileUpload>
+
+                <!-- <button *ngIf="isLoadingUpload" pButton pRipple type="button" [loading]="true" icon="pi pi-plus" class="p-button-rounded"></button> -->
+
+                <input type="text" pInputText [disabled]="true" placeholder="File danh sách QR Code"
+                    [(ngModel)]="tenFile">
+            </div>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <p-button *ngIf="tenFile.length == 0" icon="pi pi-check" [disabled]="true" label="Lưu" pAutoFocus
+            [autofocus]="true"></p-button>
+        <p-button *ngIf="tenFile.length != 0" [loading]="loading_Import" icon="pi pi-check"
+            (click)="uploadFileToActivity()" label="Lưu" pAutoFocus [autofocus]="true"></p-button>
+    </ng-template>
+</p-dialog>
+
+<p-dialog header="Header" [(visible)]="isOpen_CapPhat" [modal]="true" [style]="{ width: '50rem' }"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+    <ng-template pTemplate="header">
+        <span>CẤP PHÁT QRCODE</span>
+    </ng-template>
+
+    <div class="tab">
+        <span [ngClass]="{'active':isKieuCap==0}" class="tab_item" (click)="onKieuCap(0)">Số lượng</span>
+        <span [ngClass]="{'active':isKieuCap!=0}" class="tab_item" (click)="onKieuCap(1)">Từ đến</span>
+    </div>
+
+    <div class="grid" *ngIf="isKieuCap==0">
+        <div class="col-12">
+            <span>Số lượng QRCode chưa cấp: {{max_SoLuong}}</span>
+        </div>
+        <div class="col-12 mt-4">
+            <span class="p-float-label">
+                <p-dropdown [options]="listDonVi_CapPhat" appendTo="body" [filter]="true" optionLabel="Value"
+                    optionValue="ID" inputId="combobox_donvi" [(ngModel)]="id_don_vi_cap_phat"></p-dropdown>
+                <label for="combobox_donvi">Đơn vị</label>
+            </span>
+        </div>
+
+        <div class="col-12 mt-3">
+            <span class="p-float-label">
+                <input pInputText id="noidung" [(ngModel)]="noiDung_CapPhat" />
+                <label for="noidung">Nội dung</label>
+            </span>
+        </div>
+
+        <div class="col-12 mt-4">
+            <span class="p-float-label">
+                <span class="p-float-label">
+                    <p-inputNumber inputId="integeronly" [min]="0" [max]="max_SoLuong" [(ngModel)]="soLuongCapPhat">
+                    </p-inputNumber>
+                    <label for="number-input">Số lượng</label>
+                </span>
+            </span>
+        </div>
+    </div>
+
+    <div class="grid" *ngIf="isKieuCap!=0">
+        <div class="col-12">
+            QRCode chưa cấp từ {{mintu_SoLuong}} đến {{maxden_SoLuong}}
+        </div>
+        <div class="col-12 mt-4">
+            <span class="p-float-label">
+                <p-dropdown [options]="listDonVi_CapPhat" appendTo="body" [filter]="true" optionLabel="Value"
+                    optionValue="ID" inputId="combobox_donvi" [(ngModel)]="id_don_vi_cap_phat"></p-dropdown>
+                <label for="combobox_donvi">Đơn vị</label>
+            </span>
+        </div>
+
+        <div class="col-12 mt-3">
+            <span class="p-float-label">
+                <input pInputText id="noidung" [(ngModel)]="noiDung_CapPhat" />
+                <label for="noidung">Nội dung</label>
+            </span>
+        </div>
+
+        <div class="col-6 mt-4">
+            <span class="p-float-label">
+                <span class="p-float-label">
+                    <p-inputNumber inputId="tu_CapPhat" [min]="mintu_SoLuong" [max]="maxden_SoLuong" [(ngModel)]="tu_CapPhat">
+                    </p-inputNumber>
+                    <label for="tu_CapPhat">Từ</label>
+                </span>
+            </span>
+        </div>
+        <div class="col-6 mt-4">
+            <span class="p-float-label">
+                <span class="p-float-label">
+                    <p-inputNumber inputId="den_CapPhat" [min]="mintu_SoLuong" [max]="maxden_SoLuong" [(ngModel)]="den_CapPhat">
+                    </p-inputNumber>
+                    <label for="den_CapPhat">Đến</label>
+                </span>
+            </span>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <p-button  [loading]="loadingCapPhat" icon="pi pi-check" (click)="capPhatQRCode()"
+            label="Lưu" pAutoFocus [autofocus]="true"></p-button>
+    </ng-template>
+</p-dialog>
+
+<p-confirmDialog key="qrcodecapphat"></p-confirmDialog>

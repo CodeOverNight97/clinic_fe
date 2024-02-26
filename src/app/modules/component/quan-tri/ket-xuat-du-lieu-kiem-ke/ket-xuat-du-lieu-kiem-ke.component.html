@@ -1,0 +1,14 @@
+<div class="importTaiSan">
+    <div class="pending" *ngIf="penddingImport">
+        <div style="width: 30%;">
+            <p-progressBar [value]="value"></p-progressBar>
+        </div>
+    </div>
+    <div class="chonDonVi">
+        <p-dropdown [options]="ListDonVi" optionValue="id_don_vi" [(ngModel)]="ID_DonVi" (onChange)="changeDonVi()"
+            placeholder="Chọn đơn vị kết xuất kiểm kê" optionLabel="ten_don_vi" [showClear]="true"></p-dropdown>
+    </div>
+    <p-button icon="pi pi-upload" class="p-button-info" title="Kết xuất kiểm kê" label="Kết xuất kiểm kê"
+        [disabled]="!loadKetXuatDuLieuKiemKe" (onClick)="KetXuatDuLieu()"></p-button>
+</div>
+<p-toast key="ketNhapDuLieuKiemKe" position="bottom-right"></p-toast>

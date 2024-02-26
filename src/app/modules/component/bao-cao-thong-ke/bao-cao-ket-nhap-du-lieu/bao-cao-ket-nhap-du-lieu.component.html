@@ -1,0 +1,224 @@
+<div class="card" style="border-radius:0">
+    <div class="grid">
+        <div class="col-12 text-center mb-2">
+            <h3 class="m-2">BÁO CÁO KẾT NHẬP DỮ LIỆU</h3>
+            <h5 class="m-1">Thời điểm: Ngày {{dateTuNgay | date: 'dd'}} tháng {{dateTuNgay | date: 'MM'}} năm
+                {{dateTuNgay | date: 'yyyy'}}
+                đến ngày {{dateDenNgay | date: 'dd'}} tháng {{dateDenNgay | date: 'MM'}} năm {{dateDenNgay | date:
+                'yyyy'}}
+            </h5>
+        </div>
+
+        <div class="col">
+            <span class="p-float-label">
+                <p-calendar [(ngModel)]="dateTuNgay" inputId="birth_date" appendTo="body" [showTime]="true"
+                    dateFormat="dd/mm/yy"></p-calendar>
+                <label for="birth_date">Từ ngày</label>
+            </span>
+        </div>
+
+        <div class="col">
+            <span class="p-float-label">
+                <p-calendar [(ngModel)]="dateDenNgay" inputId="birth_date" appendTo="body" [showTime]="true"
+                    dateFormat="dd/mm/yy"></p-calendar>
+                <label for="birth_date">Đến ngày</label>
+            </span>
+        </div>
+
+        <div class="col-4">
+            <span class="p-float-label">
+                <p-dropdown [options]="comboboxDonVi" [(ngModel)]="select_donvi" placeholder="Tất cả" [filter]="false"
+                    [showClear]="true" appendTo="body" optionLabel="Value" optionValue="ID"
+                    inputId="combobox_donvi"></p-dropdown>
+                <label for="combobox_donvi">Đơn vị gốc</label>
+            </span>
+        </div>
+
+        <div class="col-3">
+            <p-button label="Tìm kiếm" [disabled]="loading_search" [loading]="loading_search" (click)="Search()" icon="pi pi-search" class="mr-2"></p-button>
+        </div>
+    </div>
+
+    <div class="grid mt-3">
+        <div class="col p-0">
+            <p-table [value]="listData" [(selection)]="selectionKetNhapKiemKe" selectionMode="single"
+                [columns]="cols" [rowHover]="true" [paginator]="false" [showCurrentPageReport]="false"
+                [rows]="100000" [scrollable]="true" scrollHeight="calc(80vh)" (onRowSelect)="onRowSelect($event)"
+                [metaKeySelection]="true" [loading]="loading_search" responsiveLayout="scroll" scrollDirection="both"
+                currentPageReportTemplate="Hiển thị {first} - {last} trong số {totalRecords} bản ghi"
+                styleClass="clm p-datatable-gridlines p-datatable-sm">
+                <ng-template pTemplate="header" let-columns>
+                    <tr class="text-center">
+                        <th class="sticky_header grid_header_color" *ngFor="let col of columns"
+                            [ngStyle]="{'width': col.width, 'text-align': 'center', 'justify-content':'center'}">
+                            {{col.header}}
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage" let-columns>
+                    <tr>
+                        <td [attr.colspan]="columns.length" style="font-size: 2rem;">
+                            Không có dữ liệu
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-columns="columns" let-rowData let-rowIndex="rowIndex">
+                    <tr [pSelectableRow]="rowData" [pSelectableRowIndex]="rowIndex">
+                        <td *ngFor="let col of columns"
+                            [ngStyle]="{'width': col.width , 'justify-content': col.align, 'text-align': col.align}"
+                            [ngSwitch]="col.field">
+                            <div *ngSwitchCase="'stt'" style="justify-content: center; text-align: center">
+                                {{ rowIndex + 1 }}
+                            </div>
+                            <div *ngSwitchDefault title="{{rowData[col.field]}}">
+                                {{rowData[col.field]}}
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+        <div class="col-9 p-0">
+            <p-tabView>
+                <p-tabPanel header="Kết nhập">
+                    <p-table [value]="ListDataKetNhap" [columns]="cols_ketnhap" [rowHover]="true" [paginator]="true"
+                        [showCurrentPageReport]="true" [rows]="50" [scrollable]="true"
+                        scrollHeight="calc(100vh - 28rem)" responsiveLayout="scroll" scrollDirection="both"
+                        [loading]="loading_search_chitiet"
+                        currentPageReportTemplate="Hiển thị {first} - {last} trong số {totalRecords} bản ghi"
+                        styleClass="clm p-datatable-gridlines p-datatable-sm">
+                        <ng-template pTemplate="header" let-columns>
+                            <tr class="text-center">
+                                <th class="sticky_header grid_header_color" *ngFor="let col of columns"
+                                    [ngStyle]="{'min-width': col.width, 'text-align': 'center', 'justify-content':'center'}">
+                                    {{col.header}}
+                                </th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="emptymessage" let-columns>
+                            <tr>
+                                <td [attr.colspan]="columns.length" style="font-size: 2rem;">
+                                    Không có dữ liệu
+                                </td>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body" let-columns="columns" let-rowData let-i="rowIndex">
+                            <tr>
+                                <td *ngFor="let col of columns"
+                                    [ngStyle]="{'min-width': col.width , 'justify-content': col.align, 'text-align': col.align}"
+                                    [ngSwitch]="col.field">
+                                    <div *ngSwitchCase="'stt'" style="justify-content: center; text-align: center">
+                                        {{ i + 1 }}
+                                    </div>
+
+                                    <div *ngSwitchCase="'created_date'"
+                                        [ngStyle]="{'justify-content': col.align, 'text-align': col.align}">
+                                        {{rowData['created_date'] | date: 'HH:mm:ss dd/MM/yyyy'}}
+                                    </div>
+
+                                    <div *ngSwitchDefault title="{{rowData[col.field]}}">
+                                        {{rowData[col.field]}}
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </p-tabPanel>
+                <p-tabPanel header="Đơn vị">
+                    <p-table [value]="listDataChiTietDonVi" [columns]="cols_donvi" [rowHover]="true" [paginator]="true"
+                        [showCurrentPageReport]="true" [rows]="50" [scrollable]="true"
+                        scrollHeight="calc(100vh - 28rem)" responsiveLayout="scroll" scrollDirection="both"
+                        [loading]="loading_search_chitiet"
+                        currentPageReportTemplate="Hiển thị {first} - {last} trong số {totalRecords} bản ghi"
+                        styleClass="clm p-datatable-gridlines p-datatable-sm">
+                        <ng-template pTemplate="header" let-columns>
+                            <tr class="text-center">
+                                <th class="sticky_header grid_header_color" *ngFor="let col of columns"
+                                    [ngStyle]="{'min-width': col.width, 'text-align': 'center', 'justify-content':'center'}">
+                                    {{col.header}}
+                                </th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="emptymessage" let-columns>
+                            <tr>
+                                <td [attr.colspan]="columns.length" style="font-size: 2rem;">
+                                    Không có dữ liệu
+                                </td>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body" let-columns="columns" let-rowData let-i="rowIndex">
+                            <tr>
+                                <td *ngFor="let col of columns"
+                                    [ngStyle]="{'min-width': col.width , 'justify-content': col.align, 'text-align': col.align}"
+                                    [ngSwitch]="col.field">
+                                    <div *ngSwitchCase="'stt'" style="justify-content: center; text-align: center">
+                                        {{ i + 1 }}
+                                    </div>
+
+                                    <div *ngSwitchCase="'created_date'"
+                                        [ngStyle]="{'justify-content': col.align, 'text-align': col.align}">
+                                        {{rowData['created_date'] | date: 'HH:mm:ss dd/MM/yyyy'}}
+                                    </div>
+
+                                    <div *ngSwitchDefault title="{{rowData[col.field]}}">
+                                        {{rowData[col.field]}}
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </p-tabPanel>
+                <p-tabPanel header="Loại tài sản">
+                    <p-table [value]="listDataChiTietTaiSan" [columns]="cols_taisan" [rowHover]="true" [paginator]="true"
+                        [showCurrentPageReport]="true" [rows]="50" [scrollable]="true"
+                        scrollHeight="calc(100vh - 28rem)" responsiveLayout="scroll" scrollDirection="both"
+                        [loading]="loading_search_chitiet"
+                        currentPageReportTemplate="Hiển thị {first} - {last} trong số {totalRecords} bản ghi"
+                        styleClass="clm p-datatable-gridlines p-datatable-sm">
+                        <ng-template pTemplate="header" let-columns>
+                            <tr class="text-center">
+                                <th class="sticky_header grid_header_color" *ngFor="let col of columns"
+                                    [ngStyle]="{'min-width': col.width, 'text-align': 'center', 'justify-content':'center'}">
+                                    {{col.header}}
+                                </th>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="emptymessage" let-columns>
+                            <tr>
+                                <td [attr.colspan]="columns.length" style="font-size: 2rem;">
+                                    Không có dữ liệu
+                                </td>
+                            </tr>
+                        </ng-template>
+
+                        <ng-template pTemplate="body" let-columns="columns" let-rowData let-i="rowIndex">
+                            <tr>
+                                <td *ngFor="let col of columns"
+                                    [ngStyle]="{'min-width': col.width , 'justify-content': col.align, 'text-align': col.align}"
+                                    [ngSwitch]="col.field">
+                                    <div *ngSwitchCase="'stt'" style="justify-content: center; text-align: center">
+                                        {{ i + 1 }}
+                                    </div>
+
+                                    <div *ngSwitchCase="'created_date'"
+                                        [ngStyle]="{'justify-content': col.align, 'text-align': col.align}">
+                                        {{rowData['created_date'] | date: 'HH:mm:ss dd/MM/yyyy'}}
+                                    </div>
+
+                                    <div *ngSwitchDefault title="{{rowData[col.field]}}">
+                                        {{rowData[col.field]}}
+                                    </div>
+                                </td>
+                            </tr>
+                        </ng-template>
+                    </p-table>
+                </p-tabPanel>
+            </p-tabView>
+        </div>
+    </div>
+</div>

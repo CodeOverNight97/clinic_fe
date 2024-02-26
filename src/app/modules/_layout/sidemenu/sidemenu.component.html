@@ -1,0 +1,15 @@
+<!-- <img src="../../../../assets/images/banner.png" class="img-fluid rounded-top" style="width: 100%;" alt="" /> -->
+
+<div class="card">
+    <div class="menu">
+        <div *ngFor="let item of items">
+            <div (click)="RidirectToLink(item.link)">{{item.text}}</div>
+        </div>
+    </div>
+    <div class="option">
+        <div (click)="logout()">Đăng xuất</div>
+    </div>
+</div>
+
+<router-outlet></router-outlet>
+<p-toast position="bottom-right" key="notification" [baseZIndex]="5000"></p-toast>

@@ -1,0 +1,482 @@
+<div class="card" style="border-radius:0">
+    <div class="grid pt-2">
+        <div class="col">
+            <span class="p-float-label">
+                <p-dropdown [options]="listLoaiTaiSan" placeholder="Tất cả" [filter]="true" [showClear]="true"
+                    appendTo="body" optionLabel="Value" optionValue="ID" inputId="combobox_loaitaisan"
+                    [(ngModel)]="taiSanFilter.ma_loai_tai_san"></p-dropdown>
+                <label for="combobox_loaitaisan">Loại tài sản</label>
+            </span>
+        </div>
+
+        <div class="col">
+            <span class="p-float-label">
+                <p-dropdown [options]="listDonVi" placeholder="Tất cả" [filter]="true" [showClear]="true"
+                    appendTo="body" optionLabel="Value" optionValue="ID" inputId="combobox_donvi"
+                    [(ngModel)]="taiSanFilter.id_don_vi"></p-dropdown>
+                <label for="combobox_donvi">Đơn vị gốc</label>
+            </span>
+        </div>
+
+        <div class="col">
+            <span class="p-float-label">
+                <input pInputText id="ma_tai_san" [(ngModel)]="taiSanFilter.ma_tai_san" />
+                <label for="ma_tai_san">Mã tài sản</label>
+            </span>
+        </div>
+
+        <div class="col">
+            <span class="p-float-label">
+                <p-dropdown [options]="listTrangThai" placeholder="Tất cả" [filter]="true" [showClear]="true"
+                    appendTo="body" optionLabel="Value" optionValue="ID" inputId="combobox_trangthai"
+                    [(ngModel)]="taiSanFilter.trang_thai"></p-dropdown>
+                <label for="combobox_trangthai">Trạng thái</label>
+            </span>
+        </div>
+
+        <div class="col-12">
+            <p-button label="Tìm kiếm" [loading]="loading" [disabled]="loading_excel" icon="pi pi-search"
+                (click)="loadData()" class="mr-2"></p-button>
+
+            <p-button label="Tìm kiếm nâng cao" [loading]="loading" [disabled]="loading_excel" icon="pi pi-filter"
+                (click)="isOpenLoadNangCao = true" class="mr-2"></p-button>
+
+            <p-button label="Xuất file Excel" [disabled]="loading" [loading]="loading_excel" (click)="XuatExcel()"
+                icon="pi pi-file-excel" class="mr-2"></p-button>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="col-12">
+            <p-table #data_report [value]="data_CallAPI" [columns]="cols_List_CallAPI" [loading]="loading" [rows]="50"
+                [rowHover]="true" dataKey="stt" [lazy]="true" [showCurrentPageReport]="true" [paginator]="true"
+                [scrollable]="true" (onPage)="loadGridChange($event)" [totalRecords]="total_data"
+                scrollHeight="calc(100vh - 20rem)" scrollDirection="both" responsiveLayout="scroll"
+                currentPageReportTemplate="Hiển thị {first} - {last} trong số {totalRecords} bản ghi"
+                styleClass="clm p-datatable-gridlines p-datatable-sm">
+                <ng-template pTemplate="header" let-columns>
+                    <tr class="text-center">
+                        <th class="sticky_header grid_header_color" *ngFor="let col of columns"
+                            [ngStyle]="{'min-width': col.width, 'text-align': 'center', 'justify-content':'center','z-index':(col.field === 'TacVu' || col.field === 'STT' || col.field === 'trang_thai'|| col.field === 'ma_tai_san' || col.field === 'ten_tai_san') ? '10000' : '8000'}">
+                            {{col.header}}
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage" let-columns>
+                    <tr>
+                        <td [attr.colspan]="columns.length" style="font-size: 2rem;">
+                            Không có dữ liệu
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-columns="columns" let-rowData let-i="rowIndex">
+                    <tr>
+                        <td *ngFor="let col of columns"
+                            [ngStyle]="{'min-width': col.width , 'justify-content': col.align, 'text-align':col.align}"
+                            [ngSwitch]="col.field">
+
+                            <div *ngSwitchCase="'TacVu'" style="justify-content:center; text-align:center">
+                                <button pButton pRipple (click)="xemChiTietTaiSan(rowData)" type="button"
+                                    icon="pi pi-eye" class="p-button-rounded p-button-outlined"></button>
+                            </div>
+
+                            <div *ngSwitchCase="'STT'" style="justify-content:center; text-align:center">
+                                {{ i + 1 }}
+                            </div>
+
+                            <div *ngSwitchCase="'nguyen_gia_tong_tien'" style="justify-content:right; text-align:right">
+                                {{rowData[col.field] | number:'1.0-0' }}
+                            </div>
+                            <div *ngSwitchCase="'nguyen_gia_ngan_sach'" style="justify-content:right; text-align:right">
+                                {{rowData[col.field] | number:'1.0-0' }}
+                            </div>
+                            <div *ngSwitchCase="'nguyen_gia_nguon_khac'"
+                                style="justify-content:right; text-align:right">
+                                {{rowData[col.field] | number:'1.0-0' }}
+                            </div>
+                            <div *ngSwitchCase="'gia_tri_con_lai'" style="justify-content:right; text-align:right">
+                                {{rowData[col.field] | number:'1.0-0' }}
+                            </div>
+
+                            <div *ngSwitchCase="'qrcode_ngay_cap'" style="justify-content:right; text-align:right">
+                                <span *ngIf="rowData.qrcode_ngay_cap !='1900-01-01T00:00:00'">
+                                    {{rowData[col.field] |date:'dd/MM/yyyy HH:mm:ss' }}
+                                </span>
+                            </div>
+
+                            <div *ngSwitchCase="'kiem_ke_ngay'" style="justify-content:right; text-align:right">
+                                <span *ngIf="rowData.kiem_ke_ngay !='1900-01-01T00:00:00'">
+                                    {{rowData[col.field] |date:'dd/MM/yyyy HH:mm:ss' }}
+                                </span>
+                            </div>
+
+                            <div *ngSwitchDefault title="{{rowData[col.field]}}">
+                                {{rowData[col.field]}}
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+</div>
+
+<p-dialog header="Header" [(visible)]="isChiTietTaiSan" [modal]="true" [style]="{ width: '60rem' }" [maximizable]="true"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+    <ng-template pTemplate="header">
+        <span>CHI TIẾT TÀI SẢN</span>
+    </ng-template>
+
+    <div style="height: 79vh;">
+
+        <p-fieldset legend="Thông tin tài sản" [toggleable]="true">
+            <div class="grid">
+                <div class="col-12" style="padding-left: 0rem;font-weight: 600;">Tài sản </div>
+                <div class="col-6">
+                    <span class="chitiet-tieude">Mã tài sản:&nbsp;</span>
+                    <span class="chitiet-tieude2">{{row_DataTaiSan.ma_tai_san}}</span>
+                </div>
+                <div class="col-6">
+                    <span class="chitiet-tieude">Tên tài sản:&nbsp;</span>
+                    <span class="chitiet-tieude2">{{row_DataTaiSan.ten_tai_san}}</span>
+                </div>
+                <div class="col-6">
+                    <span class="chitiet-tieude">Mã loại tài sản:&nbsp;</span>
+                    <span class="chitiet-tieude2">{{row_DataTaiSan.ma_loai_tai_san}}</span>
+                </div>
+                <div class="col-6">
+                    <span class="chitiet-tieude">Tên loại tài sản:&nbsp;</span>
+                    <span class="chitiet-tieude2">{{row_DataTaiSan.ten_loai_tai_san}}</span>
+                </div>
+                <div class="col-12">
+                    <span class="chitiet-tieude">Năm sử dụng:&nbsp;</span>
+                    <span class="chitiet-tieude2">{{row_DataTaiSan.nam_su_dung}}</span>
+                </div>
+                <div class="col-12">
+                    <span class="chitiet-tieude">Thông số kỹ thuật:&nbsp;</span>
+                    <span class="chitiet-tieude2">{{row_DataTaiSan.thong_so_ky_thuat}}</span>
+                </div>
+                <div class="col-12">
+                    <span class="chitiet-tieude">Ghi chú:&nbsp;</span>
+                    <span>{{row_DataTaiSan.ghi_chu}}</span>
+                </div>
+
+                <div class="col-12" style="padding-left: 0rem;font-weight: 600;">Đơn vị</div>
+
+                <div class="col-12">
+                    <span class="chitiet-tieude">Đơn vị gốc:&nbsp;</span>
+                    <span class="chitiet-tieude2">{{row_DataTaiSan.ten_don_vi_goc}}</span>
+                </div>
+                <div class="col-12">
+                    <span class="chitiet-tieude">Đơn vị quản lý:&nbsp;</span>
+                    <span class="chitiet-tieude2">{{row_DataTaiSan.ten_don_vi_quan_ly}}</span>
+                </div>
+
+                <div class="col-12" style="padding-left: 0rem;font-weight: 600;">Nguyên giá</div>
+                <div class="col-4">
+                    <span class="chitiet-tieude">Tổng tiền:&nbsp;</span>
+                    <span class="chitiet-tieude2">{{row_DataTaiSan.nguyen_gia_tong_tien | number:'1.0-0' }}</span>
+                </div>
+
+                <div class="col-4">
+                    <span class="chitiet-tieude">Ngân sách:&nbsp;</span>
+                    <span class="chitiet-tieude2">{{row_DataTaiSan.nguyen_gia_ngan_sach | number:'1.0-0' }}</span>
+                </div>
+                <div class="col-4">
+                    <span class="chitiet-tieude">Nguồn khác:&nbsp;</span>
+                    <span class="chitiet-tieude2">{{row_DataTaiSan.nguyen_gia_nguon_khac | number:'1.0-0' }}</span>
+                </div>
+                <div class="col-12">
+                    <span class="chitiet-tieude">Giá trị còn lại:&nbsp;</span>
+                    <span class="chitiet-tieude2">{{row_DataTaiSan.gia_tri_con_lai | number:'1.0-0' }}</span>
+                </div>
+
+                <div class="col-12" style="padding-left: 0rem;font-weight: 600;">QRCode</div>
+
+                <div class="col-12">
+                    <span class="chitiet-tieude">QRCode:&nbsp;</span>
+                    <span class="chitiet-tieude2">{{row_DataTaiSan.qrcode}}</span>
+                </div>
+                <div class="col-6">
+                    <span class="chitiet-tieude">Ngày cấp:&nbsp;</span>
+                    <span class="chitiet-tieude2"
+                        *ngIf="row_DataTaiSan.qrcode_ngay_cap !='1900-01-01T00:00:00'">{{row_DataTaiSan.qrcode_ngay_cap
+                        | date:'dd/MM/yyyy HH:mm:ss'}}</span>
+                </div>
+
+                <div class="col-6">
+                    <span class="chitiet-tieude">Người cấp:&nbsp;</span>
+                    <span class="chitiet-tieude2">{{row_DataTaiSan.qrcode_nguoi_cap}}</span>
+                </div>
+                <div class="col-12" style="padding-left: 0rem;font-weight: 600;">Kiểm kê</div>
+
+                <div class="col-6">
+                    <span class="chitiet-tieude">Kiểm kê ngày:&nbsp;</span>
+                    <span class="chitiet-tieude2"
+                        *ngIf="row_DataTaiSan.kiem_ke_ngay !='1900-01-01T00:00:00'">{{row_DataTaiSan.kiem_ke_ngay |
+                        date:'dd/MM/yyyy HH:mm:ss' }}</span>
+                </div>
+                <div class="col-6">
+                    <span class="chitiet-tieude">Người kiểm kê:&nbsp;</span>
+                    <span class="chitiet-tieude2">{{row_DataTaiSan.kiem_ke_nguoi}}</span>
+                </div>
+                <div class="col-12">
+                    <span class="chitiet-tieude">Nội dung kiểm kê:&nbsp;</span>
+                    <span class="chitiet-tieude2">{{row_DataTaiSan.kiem_ke_noi_dung}}</span>
+                </div>
+            </div>
+        </p-fieldset>
+
+        <div class="mt-3" *ngIf="taiSanKiemKe.length > 0"></div>
+
+        <p-fieldset legend="Thông tin kiểm kê" *ngIf="taiSanKiemKe.length > 0" [toggleable]="true">
+            <div class="grid" *ngFor="let item of taiSanKiemKe" style="border-bottom: solid 1px; padding-top: 1rem;">
+                <div class="col-6">
+                    <span class="chitiet-tieude">Ngày kiểm kê:&nbsp;</span>
+                    <span class="chitiet-tieude2">{{item.kiem_ke_ngay | date:'dd/MM/yyyy HH:mm:ss'}}</span>
+                </div>
+                <div class="col-6">
+                    <span class="chitiet-tieude">Người kiểm kê:&nbsp;</span>
+                    <span class="chitiet-tieude2">{{item.kiem_ke_nguoi}}</span>
+                </div>
+                <div class="col-12">
+                    <span class="chitiet-tieude">Nội dung:&nbsp;</span>
+                    <span class="chitiet-tieude2">{{item.kiem_ke_noi_dung}}</span>
+                </div>
+            </div>
+        </p-fieldset>
+    </div>
+</p-dialog>
+
+
+
+<p-dialog header="Header" [(visible)]="isOpenLoadNangCao" [modal]="true" [style]="{ width: '70rem' }"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+    <ng-template pTemplate="header">
+        <span>Tìm kiếm nâng cao</span>
+    </ng-template>
+    <div class="grid">
+        <div class="col-4 mt-5">
+            <span class="p-float-label">
+                <input pInputText id="ma_tai_san" [(ngModel)]="taiSanFilter.ma_tai_san" />
+                <label for="ma_tai_san">Mã tài sản</label>
+            </span>
+        </div>
+
+        <div class="col-8 mt-5">
+            <span class="p-float-label">
+                <input pInputText id="ten_tai_san" [(ngModel)]="taiSanFilter.ten_tai_san" />
+                <label for="ten_tai_san">Tên tài sản</label>
+            </span>
+        </div>
+
+
+        <div class="col-4 mt-3">
+            <span class="p-float-label">
+                <p-dropdown [options]="listTrangThai" placeholder="Tất cả" [filter]="true" [showClear]="true"
+                    appendTo="body" optionLabel="Value" optionValue="ID" inputId="combobox_trangthai"
+                    [(ngModel)]="taiSanFilter.trang_thai"></p-dropdown>
+                <label for="combobox_trangthai">Trạng thái</label>
+            </span>
+        </div>
+
+        <div class="col-8 mt-3">
+            <span class="p-float-label">
+                <p-dropdown [options]="listLoaiTaiSan" placeholder="Tất cả" [filter]="true" [showClear]="true"
+                    appendTo="body" optionLabel="Value" optionValue="ID" inputId="combobox_loaitaisan"
+                    [(ngModel)]="taiSanFilter.ma_loai_tai_san"></p-dropdown>
+                <label for="combobox_loaitaisan">Loại tài sản</label>
+            </span>
+        </div>
+
+        <div class="col-4 mt-3">
+            <span class="p-float-label">
+                <input pInputText id="nam_su_dung" [(ngModel)]="taiSanFilter.nam_su_dung" />
+                <label for="nam_su_dung">Năm sử dụng</label>
+            </span>
+        </div>
+
+        <div class="col-8 mt-3">
+            <span class="p-float-label">
+                <input pInputText id="thong_so_ky_thuat" [(ngModel)]="taiSanFilter.thong_so_ky_thuat" />
+                <label for="thong_so_ky_thuat">Thông số kỹ thuật</label>
+            </span>
+        </div>
+
+
+        <div class="col-12 mt-3">
+            <span class="p-float-label">
+                <p-dropdown [options]="listDonVi" placeholder="Tất cả" [filter]="true" [showClear]="true"
+                    appendTo="body" optionLabel="Value" optionValue="ID" inputId="combobox_donvi"
+                    [(ngModel)]="taiSanFilter.id_don_vi"></p-dropdown>
+                <label for="combobox_donvi">Đơn vị gốc</label>
+            </span>
+        </div>
+
+        <div class="col-12 mt-3">
+            <span class="p-float-label">
+                <input pInputText id="ten_don_vi_quan_ly" [(ngModel)]="taiSanFilter.ten_don_vi_quan_ly" />
+                <label for="ten_don_vi_quan_ly">Đơn vị quản lý</label>
+            </span>
+        </div>
+
+        <div class="col-6 mt-3">
+            <span class="p-float-label">
+                <span class="p-float-label">
+                    <p-inputNumber inputId="tong_tien_tu" [min]="0" [max]="10000000000"
+                        [(ngModel)]="taiSanFilter.tong_tien_tu">
+                    </p-inputNumber>
+                    <label for="tong_tien_tu">Nguyên giá tổng tiền từ</label>
+                </span>
+            </span>
+        </div>
+
+        <div class="col-6 mt-3">
+            <span class="p-float-label">
+                <span class="p-float-label">
+                    <p-inputNumber inputId="tong_tien_den" [min]="0" [max]="10000000000"
+                        [(ngModel)]="taiSanFilter.tong_tien_den">
+                    </p-inputNumber>
+                    <label for="tong_tien_den">Nguyên giá tổng tiền đến</label>
+                </span>
+            </span>
+        </div>
+
+        <div class="col-6 mt-3">
+            <span class="p-float-label">
+                <span class="p-float-label">
+                    <p-inputNumber inputId="ngan_sach_tu" [min]="0" [max]="10000000000"
+                        [(ngModel)]="taiSanFilter.ngan_sach_tu">
+                    </p-inputNumber>
+                    <label for="ngan_sach_tu">Nguyên giá ngân sách từ</label>
+                </span>
+            </span>
+        </div>
+
+        <div class="col-6 mt-3">
+            <span class="p-float-label">
+                <span class="p-float-label">
+                    <p-inputNumber inputId="ngan_sach_den" [min]="0" [max]="10000000000"
+                        [(ngModel)]="taiSanFilter.ngan_sach_den">
+                    </p-inputNumber>
+                    <label for="ngan_sach_den">Nguyên giá ngân sách đến</label>
+                </span>
+            </span>
+        </div>
+
+        <div class="col-6 mt-3">
+            <span class="p-float-label">
+                <span class="p-float-label">
+                    <p-inputNumber inputId="nguon_khac_tu" [min]="0" [max]="10000000000"
+                        [(ngModel)]="taiSanFilter.nguon_khac_tu">
+                    </p-inputNumber>
+                    <label for="nguon_khac_tu">Nguyên giá nguồn khác từ</label>
+                </span>
+            </span>
+        </div>
+
+        <div class="col-6 mt-3">
+            <span class="p-float-label">
+                <span class="p-float-label">
+                    <p-inputNumber inputId="nguon_khac_den" [min]="0" [max]="10000000000"
+                        [(ngModel)]="taiSanFilter.nguon_khac_den">
+                    </p-inputNumber>
+                    <label for="nguon_khac_den">Nguyên giá nguồn khác đến</label>
+                </span>
+            </span>
+        </div>
+
+        <div class="col-6 mt-3">
+            <span class="p-float-label">
+                <span class="p-float-label">
+                    <p-inputNumber inputId="gia_tri_con_lai_tu" [min]="0" [max]="10000000000"
+                        [(ngModel)]="taiSanFilter.gia_tri_con_lai_tu">
+                    </p-inputNumber>
+                    <label for="gia_tri_con_lai_tu">Giá trị còn lại từ</label>
+                </span>
+            </span>
+        </div>
+
+        <div class="col-6 mt-3">
+            <span class="p-float-label">
+                <span class="p-float-label">
+                    <p-inputNumber inputId="gia_tri_con_lai_den" [min]="0" [max]="10000000000"
+                        [(ngModel)]="taiSanFilter.gia_tri_con_lai_den">
+                    </p-inputNumber>
+                    <label for="gia_tri_con_lai_den">Giá trị còn lại đến</label>
+                </span>
+            </span>
+        </div>
+
+        <div class="col-12 mt-3">
+            <span class="p-float-label">
+                <input pInputText id="ghi_chu" [(ngModel)]="taiSanFilter.ghi_chu" />
+                <label for="ghi_chu">Ghi chú</label>
+            </span>
+        </div>
+
+        <div class="col-12 mt-3">
+            <span class="p-float-label">
+                <input pInputText id="qr_code" [(ngModel)]="taiSanFilter.qr_code" />
+                <label for="qr_code">QRCode</label>
+            </span>
+        </div>
+
+        <div class="col-6 mt-3">
+            <span class="p-float-label">
+                <p-calendar [(ngModel)]="ngay_cap_qr_code_tu" inputId="ngay_cap_qr_code_tu" appendTo="body" dateFormat="dd/mm/yy"
+                    [showTime]="true"></p-calendar>
+                <label for="ngay_cap_qr_code_tu">Ngày cấp QRCode từ</label>
+            </span>
+        </div>
+
+        <div class="col-6 mt-3">
+            <span class="p-float-label">
+                <p-calendar [(ngModel)]="ngay_cap_qr_code_den" inputId="ngay_cap_qr_code_den" appendTo="body"
+                    dateFormat="dd/mm/yy" [showTime]="true"></p-calendar>
+                <label for="ngay_cap_qr_code_den">Ngày cấp QRCode đến</label>
+            </span>
+        </div>
+
+        <div class="col-12 mt-3">
+            <span class="p-float-label">
+                <input pInputText id="nguoi_cap_qr" [(ngModel)]="taiSanFilter.nguoi_cap_qr" />
+                <label for="nguoi_cap_qr">Người cấp QRCode</label>
+            </span>
+        </div>
+
+        <div class="col-6 mt-3">
+            <span class="p-float-label">
+                <p-calendar [(ngModel)]="ngay_kiem_ke_tu" inputId="ngay_kiem_ke_tu" appendTo="body" dateFormat="dd/mm/yy"
+                    [showTime]="true"></p-calendar>
+                <label for="ngay_kiem_ke_tu">Ngày kiểm kê từ</label>
+            </span>
+        </div>
+
+        <div class="col-6 mt-3">
+            <span class="p-float-label">
+                <p-calendar [(ngModel)]="ngay_kiem_ke_den" inputId="ngay_kiem_ke_den" appendTo="body" dateFormat="dd/mm/yy"
+                    [showTime]="true"></p-calendar>
+                <label for="ngay_kiem_ke_den">Ngày kiểm kê đến</label>
+            </span>
+        </div>
+
+        <div class="col-12 mt-3">
+            <span class="p-float-label">
+                <input pInputText id="noi_dung_kiem_ke" [(ngModel)]="taiSanFilter.noi_dung_kiem_ke" />
+                <label for="noi_dung_kiem_ke">Nội dung kiểm kê</label>
+            </span>
+        </div>
+
+        <div class="col-12 mt-3">
+            <span class="p-float-label">
+                <input pInputText id="nguoi_kiem_ke" [(ngModel)]="taiSanFilter.nguoi_kiem_ke" />
+                <label for="nguoi_kiem_ke">Người kiểm kê</label>
+            </span>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <p-button icon="pi pi-search" label="Tìm kiếm" [loading]="loading" pAutoFocus [autofocus]="true"
+            (click)="timKiemNangCao()"></p-button>
+    </ng-template>
+</p-dialog>

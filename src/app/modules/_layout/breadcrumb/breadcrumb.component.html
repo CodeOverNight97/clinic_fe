@@ -1,0 +1,8 @@
+<div class="breadcum">
+    <ul>
+        <li><i class='bx bx-home-circle'></i></li>
+        <li class="breadcum-text" *ngFor="let breadcrumb of (breadcrumbs$ | async)">
+            <a >{{ breadcrumb.label }}</a>
+        </li>
+    </ul>
+</div>

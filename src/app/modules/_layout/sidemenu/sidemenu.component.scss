@@ -1,0 +1,25 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@600&display=swap");
+.card{
+  display: flex;
+  border-radius: unset !important;
+  background-color: #026bd5;
+  justify-content: space-between;
+  margin-bottom: 0 !important;
+}
+.menu{
+  display: flex;
+}
+.option{
+  padding: 0 10px;
+  cursor: pointer;
+  color:  #fff;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+.card>.menu>div{
+  padding: 0 10px;
+  cursor: pointer;
+  color:  #fff;
+  text-transform: uppercase;
+  font-weight: bold;
+}

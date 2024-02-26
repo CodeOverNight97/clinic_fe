@@ -1,0 +1,24 @@
+export class TaiSanViewModel {
+    total: number = 0
+    ma_tai_san: string = ''
+    ma_loai_tai_san: string = ''
+    ten_loai_tai_san: string = ''
+    ten_tai_san: string = ''
+    nam_su_dung: string = ''
+    thong_so_ky_thuat: string = ''
+    id_don_vi_goc: number = 0
+    ten_don_vi_goc: string = ''
+    id_don_vi_quan_ly: number = 0
+    ten_don_vi_quan_ly: string = ''
+    nguyen_gia_tong_tien: number = 0
+    nguyen_gia_ngan_sach: number = 0
+    nguyen_gia_nguon_khac: number = 0
+    gia_tri_con_lai: number = 0
+    ghi_chu: string = ''
+    qrcode: string = ''
+    qrcode_ngay_cap: string = ''
+    qrcode_nguoi_cap: string = ''
+    kiem_ke_ngay: string = ''
+    kiem_ke_nguoi: string = ''
+    kiem_ke_noi_dung: string = ''
+}

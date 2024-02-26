@@ -1,0 +1,7 @@
+<div class="menuBarLeft">
+    <div *ngFor="let item of itemMenuBarLeft">
+        <div class="itemMenu" [ngClass]="{'activeMenu': item.isActive}" (click)="redirectToLink(item.routerLink, item.ID)">
+            <i class={{item.icon}} style="color: rgb(17, 0, 255);"></i>{{item.menuName}}
+        </div>
+    </div>
+</div>

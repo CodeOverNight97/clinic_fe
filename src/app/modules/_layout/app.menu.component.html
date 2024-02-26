@@ -1,0 +1,60 @@
+<!-- <ul class="layout-menu">
+    <ng-container *ngFor="let item of Menu; let i = index;">
+        <li app-menuitem *ngIf="!item.separator" [item]="item" [index]="i" [root]="true"></li>
+        <li *ngIf="item.separator" class="menu-separator"></li>
+    </ng-container>
+</ul> -->
+
+<!-- <div class="sidebar">
+    <a href="#" class="logo-box">
+        <img src="assets\images\lh_logo.png" routerLink="/home/dashboard" style="cursor:pointer" height="40" class="mr-5">
+    </a>
+
+    <ul class="sidebar-list">
+        <li *ngFor="let item of Menu" class="dropdown">
+            <div class="title">
+                <div class="link">
+                    <i [ngClass]="getIconByTenChucNang(item.TenChucNang)"></i>
+                    <span class="name">{{item.TenChucNang}}</span>
+                </div>
+                <i *ngIf="item.items" class='bx bxs-chevron-down'></i>
+            </div>
+
+            <div *ngIf="item.items">
+                <div class="submenu">
+                    <div *ngFor="let _item of item.items" class="link">{{_item.TenChucNang}}</div>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div> -->
+
+
+<style>
+    .h{
+    height: 50px;
+    }
+    .imgs{
+        height: 30px;
+        margin-top: 5px;
+    }
+    .tieude{
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+        font-weight: 500;
+        margin-left: 10px;
+    }
+    </style>
+    
+    <ul class="layout-menu">
+        <div class="h">
+            <a class="layout-topbar-logo" routerLink="/giocongviec">
+                <img class="imgs" src="assets/images/logo_toda.png" alt="logo">
+                <span class="text-blue-700 tieude">Eclaim Bảo Minh</span>
+            </a>
+        </div>
+        <ng-container *ngFor="let item of model; let i = index;">
+            <li app-menuitem [item]="item" [index]="i" [root]="true"></li>
+            <li *ngIf="item.separator" class="menu-separator"></li>
+        </ng-container>
+    </ul>

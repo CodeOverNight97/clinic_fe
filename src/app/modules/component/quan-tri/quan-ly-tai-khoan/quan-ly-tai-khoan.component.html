@@ -1,0 +1,151 @@
+<div class="card" style="border-radius:0">
+    <div class="grid pt-2">
+        <div class="col">
+            <span class="p-float-label">
+                <input pInputText id="ma_tai_san" [(ngModel)]="select_ten_tai_khoan" />
+                <label for="ma_tai_san">Tên đầy đủ</label>
+            </span>
+        </div>
+
+
+        <!-- <div class="col">
+            <span class="p-float-label">
+                <p-dropdown [options]="listLoaiTaiKhoan" placeholder="Tất cả" [filter]="true" [showClear]="true"
+                    appendTo="body" optionLabel="Value" optionValue="ID" inputId="combobox_donvi"
+                    [(ngModel)]="select_loai_tai_khoan"></p-dropdown>
+                <label for="combobox_donvi">Loại tài khoản</label>
+            </span>
+        </div> -->
+
+        <div class="col">
+            <span class="p-float-label">
+                <p-dropdown [options]="listDonVi" placeholder="Tất cả" [filter]="true" [showClear]="true"
+                    appendTo="body" optionLabel="Value" optionValue="ID" inputId="combobox_trangthai"
+                    [(ngModel)]="select_don_vi"></p-dropdown>
+                <label for="combobox_trangthai">Đơn vị</label>
+            </span>
+        </div>
+
+        <div class="col-12">
+            <p-button label="Tìm kiếm" [loading]="loading" [disabled]="loading_excel" icon="pi pi-search"
+                (click)="loadData()" class="mr-2"></p-button>
+
+            <p-button label="Thêm tài khoản" icon="pi pi-plus" (click)="openThemTaiKhoan()" class="mr-2"></p-button>
+
+            <p-button label="Xuất file Excel" [disabled]="loading" [loading]="loading_excel" (click)="XuatExcel()"
+                icon="pi pi-file-excel" class="mr-2"></p-button>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="col-12">
+            <p-table #data_report [value]="data_CallAPI" [columns]="cols_List_CallAPI" [loading]="loading"
+                [rowHover]="true" [paginator]="true" [showCurrentPageReport]="true" [scrollable]="true"
+                scrollHeight="calc(100vh - 31rem)" scrollDirection="both" responsiveLayout="scroll" [rows]="50"
+                currentPageReportTemplate="Hiển thị {first} - {last} trong số {totalRecords} bản ghi"
+                styleClass="clm p-datatable-gridlines p-datatable-sm">
+                <ng-template pTemplate="header" let-columns>
+                    <tr class="text-center">
+                        <th class="sticky_header grid_header_color" *ngFor="let col of columns"
+                            [ngStyle]="{'width': col.width, 'text-align': 'center', 'justify-content':'center'}">
+                            {{col.header}}
+                        </th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="emptymessage" let-columns>
+                    <tr>
+                        <td [attr.colspan]="columns.length" style="font-size: 2rem;">
+                            Không có dữ liệu
+                        </td>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-columns="columns" let-rowData let-i="rowIndex">
+                    <tr>
+                        <td *ngFor="let col of columns"
+                            [ngStyle]="{'width': col.width , 'justify-content': col.align, 'text-align':col.align}"
+                            [ngSwitch]="col.field">
+                            <div *ngSwitchCase="'STT'" style="justify-content:center; text-align:center">
+                                {{ i + 1 }}
+                            </div>
+                            <div *ngSwitchCase="'TacVu'" style="justify-content:center; text-align:center">
+                                <button *ngIf="rowData.is_lock" pButton pRipple type="button" icon="pi pi-lock"
+                                    (click)="khoaMoTaiKhoan(rowData.ten_dang_nhap,false)" title="Mở khóa tài khoản"
+                                    class="p-button-rounded p-button-outlined mr-2"></button>
+                                <button *ngIf="!rowData.is_lock" pButton pRipple type="button" icon="pi pi-lock-open"
+                                    (click)="khoaMoTaiKhoan(rowData.ten_dang_nhap,true)" title="Khóa tài khoản"
+                                    class="p-button-rounded p-button-outlined mr-2"></button>
+                                <button pButton pRipple type="button" icon="pi pi-user-edit"
+                                    (click)="openSuaTaiKhoan(rowData)" title="Cập nhật tài khoản"
+                                    class="p-button-rounded p-button-outlined"></button>
+                            </div>
+                            <div *ngSwitchDefault title="{{rowData[col.field]}}">
+                                {{rowData[col.field]}}
+                            </div>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+</div>
+
+
+<p-dialog header="Header" [(visible)]="isOpenThemTaiKhoan" [modal]="true" [style]="{ width: '50rem' }"
+    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }">
+    <ng-template pTemplate="header">
+        <!-- <span style="text-transform: uppercase; font-size: 15pt; font-weight: 600;">{{LABEL_HEADER_DIAGLOG}}</span> -->
+        <span>{{LABEL_HEADER_DIAGLOG}}</span>
+    </ng-template>
+
+    <div class="grid">
+        <div class="col-12 mt-4">
+            <span class="p-float-label">
+                <input pInputText id="ten_day_du" [(ngModel)]="ojb_TaiKhoan.ten_day_du" />
+                <label for="ten_day_du">Tên đầy đủ <span class="text-red-500">(*)</span></label>
+            </span>
+        </div>
+
+        <div class="col-12 mt-3">
+            <span class="p-float-label">
+                <input pInputText id="ten_dang_nhap" [(ngModel)]="ojb_TaiKhoan.ten_dang_nhap"
+                    [disabled]="typeTaiKhoan==2" [readOnly]="typeTaiKhoan==2"/>
+                <label for="ten_dang_nhap">Tên đăng nhập <span class="text-red-500">(*)</span></label>
+            </span>
+        </div>
+
+        <!-- <div class="col-12 mt-3">
+            <span class="p-float-label">
+                <input pInputText id="mat_khau" [(ngModel)]="ojb_TaiKhoan.mat_khau" />
+                <label for="mat_khau">Mật khẩu</label>
+            </span>
+        </div> -->
+        <div class="col-12 mt-3" *ngIf="typeTaiKhoan==1">
+            <span class="p-float-label">
+                <p-password [(ngModel)]="ojb_TaiKhoan.mat_khau" [toggleMask]="true" [feedback]="false"></p-password>
+                <label for="mat_khau">Mật khẩu <span class="text-red-500">(*)</span></label>
+            </span>
+        </div>
+
+        <!-- <div class="col-12 mt-3">
+            <span class="p-float-label">
+                <p-dropdown [options]="listLoaiTaiKhoan" placeholder="Loại tài khoản" [filter]="false" [showClear]="true"
+                    appendTo="body" optionLabel="Value" optionValue="ID" inputId="combobox_loai_tai_khoan"
+                    [(ngModel)]="ojb_TaiKhoan.loai_tai_khoan"></p-dropdown>
+                <label for="combobox_loai_tai_khoan">Loại tài khoản <span class="text-red-500">(*)</span></label>
+            </span>
+        </div> -->
+
+        <div class="col-12 mt-4">
+            <span class="p-float-label">
+                <p-dropdown [options]="listDonVi" appendTo="body" [filter]="true" optionLabel="Value" optionValue="ID" [showClear]="true"
+                    inputId="combobox_id_don_vi" [(ngModel)]="ojb_TaiKhoan.id_don_vi"></p-dropdown>
+                <label for="combobox_id_don_vi">Đơn vị <span class="text-red-500">(*)</span></label>
+            </span>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <p-button [loading]="loading_taikhoan" icon="pi pi-check" (click)="themTaiKhoan()" label="Lưu" pAutoFocus
+            [autofocus]="true"></p-button>
+    </ng-template>
+</p-dialog>
